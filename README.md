@@ -1,6 +1,8 @@
 # 🎬 API를 이용한 영화 소개 사이트
 - The movie
 
+<br>
+
 # 📑 프로젝트 소개
 `The movie`는 TMDB의 api를 이용한 영화 소개 사이트입니다. 최신 영화부터 추천영화, 높은 평점의 인기영화를 볼 수 있습니다. <br> 
 영화 검색 및 예고편, 영화의 정보를 볼 수 있습니다.
@@ -11,17 +13,37 @@
 - Vue : Vue를 이용해 영화 정보를 가져오고, 예고편 및 출연진 정보, 관련 영화 등을 상세페이지에 업로드함
 - Vercel : 완성한 결과물을 다른 사람들도 볼 수 있게 Vercel에서 웹사이트로 링크화함
 
+<br >
+
 # 🎥 주요 기능
 - 메인 : 최신 영화 / 추천 영화 / 높은 평점의 인기영화를 카테고리화하여 제공
 - 영화별 예고편과 상세보기 기능 제공
 - 상세페이지 : 개봉연도, 관람등급, 러닝타임, 평점, 줄거리, 출연진 제공
 - 영화별 관련 영화 바로 가기
 
+<br>
+
 # ✨사이트 프리뷰
 ![Vite-App](https://github.com/user-attachments/assets/b4b0f9c3-ecb9-4194-bf31-3dca77701a13)
 최신영화부터 추천영화, 높은 평점의 인기영화까지 모두 제공
 
+<br>
 
+![image](https://github.com/user-attachments/assets/7b50c112-035a-4efb-8ef3-8a938d827e78)
+영화 포스터에 마우스 오버하면 포스터가 살짝 어두워지며 영화의 `예고편` 및 `상세보기` 버튼이 생김
+
+<br>
+
+![image](https://github.com/user-attachments/assets/65ac9f39-2885-41fa-9ad6-1dae344486bd)
+- 예고편 Click :  팝업창에서 예고편 바로 감상 가능
+
+<br>
+
+![image](https://github.com/user-attachments/assets/881ed721-f679-4a83-9511-02161cfef23e)
+- 상세보기 Click : 영화 관련 정보 제공
+- 개봉연도 / 관람등급 / 러닝타임
+- 줄거리
+- 영화 출연진, 관련 영화 - 가로로 스크롤하며 볼 수 있음
 
 
 
