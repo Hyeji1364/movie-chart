@@ -77,75 +77,42 @@
       </div>
     </div>
 
-    <section class="panel recommendations scroller">
-      <div id="recommendation_waypoint">
-        <h3 dir="auto">추천</h3>
-        <div id="recommendation_scroller" class="scroller_wrap should_fade is_hidden">
-          <div class="scroller">
-            <div
-              v-for="recommendation in recommendations"
-              :key="recommendation.id"
-              class="item mini backdrop mini_card"
-            >
-              <div class="image_content glyphicons_v2 picture grey backdrop no_image_holder">
-                <a
-                  :href="'/movie/' + recommendation.id"
-                  :title="recommendation.title"
-                  :alt="recommendation.title"
-                >
-                  <img
-                    loading="lazy"
-                    class="backdrop w-full"
-                    :src="
-                      'https://image.tmdb.org/t/p/w250_and_h141_face/' +
-                      recommendation.backdrop_path
-                    "
-                    :srcset="
-                      'https://image.tmdb.org/t/p/w250_and_h141_face/' +
-                      recommendation.backdrop_path +
-                      ' 1x, https://image.tmdb.org/t/p/w500_and_h282_face/' +
-                      recommendation.backdrop_path +
-                      ' 2x'
-                    "
-                    :alt="recommendation.title"
-                  />
-                  <div class="meta">
-                    <span class="release_date">
-                      <span class="glyphicons_v2 calendar"></span>
-                      {{ recommendation.release_date }}
-                    </span>
-                    <span class="buttons">
-                      <span class="glyphicons_v2 star right rating"></span>
-                      <span
-                        class="glyphicons_v2 heart favourite list_action"
-                        data-media-type="movie"
-                      ></span>
-                      <span
-                        class="glyphicons_v2 bookmark watchlist list_action"
-                        data-media-type="movie"
-                      ></span>
-                    </span>
-                  </div>
-                </a>
-              </div>
-              <p class="movie flex">
-                <a
-                  class="title"
-                  :href="'/movie/' + recommendation.id"
-                  :title="recommendation.title"
-                  :alt="recommendation.title"
-                >
-                  <bdi>{{ recommendation.title }}</bdi>
-                </a>
-                <span class="vote_average"
-                  >{{ recommendation.vote_average }}<span class="percent">%</span></span
-                >
-              </p>
+    <div class="additional-info">
+      <h2>관련 영화</h2>
+      <div class="recommendations-container-outer">
+        <div class="recommendations-container">
+          <div v-for="similarMovie in similarMovies" :key="similarMovie.id" class="card">
+            <div class="profile">
+              <a
+                :href="'/movie/' + similarMovie.id"
+                :title="similarMovie.title"
+                :alt="similarMovie.title"
+              >
+                <img
+                  loading="lazy"
+                  :src="
+                    'https://image.tmdb.org/t/p/w250_and_h141_face/' + similarMovie.backdrop_path
+                  "
+                  :alt="similarMovie.title"
+                />
+              </a>
             </div>
+            <p>
+              <a
+                :href="'/movie/' + similarMovie.id"
+                :title="similarMovie.title"
+                :alt="similarMovie.title"
+              >
+                {{ similarMovie.title }}
+              </a>
+            </p>
+            <p class="vote_average">
+              {{ similarMovie.vote_average }}<span class="percent">%</span>
+            </p>
           </div>
         </div>
       </div>
-    </section>
+    </div>
   </div>
 </template>
 
@@ -160,7 +127,10 @@ const movie = ref(null)
 const cast = ref([])
 const trailers = ref([])
 const recommendations = ref([])
+const similarMovies = ref([])
+const relatedMovies = ref([])
 const apikey = import.meta.env.VITE_TMDB_API_KEY
+const account_id = '8016eb5b601e7aa0bd3e9e0579deeedd'
 
 const mainTrailer = ref(null)
 const fullStars = ref(0)
@@ -170,7 +140,7 @@ const emptyStars = ref(0)
 const fetchMovieDetails = async () => {
   try {
     const response = await axios.get(
-      `https://api.themoviedb.org/3/movie/${route.params.id}?api_key=${apikey}&append_to_response=release_dates,credits,videos,images,recommendations&language=ko-KR`
+      `https://api.themoviedb.org/3/movie/${route.params.id}?api_key=${apikey}&append_to_response=release_dates,credits,videos,recommendations,similar&language=ko-KR`
     )
     movie.value = response.data
 
@@ -194,43 +164,43 @@ const fetchMovieDetails = async () => {
     )
 
     // 첫 번째 예고편을 메인 예고편으로 설정
-    if (trailers.value.length > 0) {
-      mainTrailer.value = trailers.value[0]
-    }
+    mainTrailer.value = trailers.value.length > 0 ? trailers.value[0] : null
 
-    // 추천 동영상 정보
+    // 추천 영화 정보
     recommendations.value = response.data.recommendations.results
 
-    // 평점을 별점으로 변환
-    calculateStars(response.data.vote_average * 10) // API의 평점은 10점 만점이므로 100점 만점으로 변환
+    // 비슷한 영화 정보
+    similarMovies.value = response.data.similar.results
+
+    // 별점 계산
+    const rating = movie.value.vote_average / 2
+    fullStars.value = Math.floor(rating)
+    halfStar.value = rating % 1 !== 0
+    emptyStars.value = 5 - fullStars.value - (halfStar.value ? 1 : 0)
   } catch (error) {
-    console.log('Error fetching movie details:', error)
-    movie.value = {
-      title: 'Error loading data',
-      overview: 'There was an error fetching the movie details.',
-      release_date: '-',
-      runtime: '-',
-      certification: '-',
-      poster_path: null
-    }
-    cast.value = []
-    trailers.value = []
-    recommendations.value = []
+    console.error('Error fetching movie details:', error)
   }
 }
 
-const calculateStars = (percent) => {
-  const stars = percent / 20 // 별점은 5점 만점이므로 20으로 나눔
-  fullStars.value = Math.floor(stars)
-  halfStar.value = stars % 1 >= 0.5
-  emptyStars.value = 5 - fullStars.value - (halfStar.value ? 1 : 0)
+const fetchRelatedMovies = async () => {
+  try {
+    const response = await axios.get(
+      `https://api.themoviedb.org/3/account/${account_id}/rated/movies?api_key=${apikey}&language=ko-KR`
+    )
+    relatedMovies.value = response.data.results
+  } catch (error) {
+    console.error('Error fetching related movies:', error)
+  }
 }
+
+onMounted(() => {
+  fetchMovieDetails()
+  fetchRelatedMovies()
+})
 
 const goBack = () => {
-  router.back()
+  router.go(-1)
 }
-
-onMounted(fetchMovieDetails)
 </script>
 
 <style scoped>
@@ -314,6 +284,7 @@ h1 {
   gap: 2rem;
   max-width: 1200px;
   width: 100%;
+  margin-bottom: 5vh;
 }
 
 .poster {
@@ -343,7 +314,7 @@ h1 {
   margin-bottom: 2rem;
 
   h2 {
-    font-size: 2rem;
+    font-size: 1.5rem;
     margin-bottom: 1rem;
     font-weight: 700;
   }
@@ -385,7 +356,7 @@ h1 {
   flex: 0 0 auto;
   text-align: center;
   color: #fff;
-  background-color: #333;
+  background-color: rgba(0, 0, 0, 0.3);
   border-radius: 10px;
   padding: 1rem;
 }
@@ -423,62 +394,29 @@ h1 {
   margin-top: 2rem;
 }
 
-.scroller_wrap {
+.recommendations-container-outer {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.recommendations-container {
+  display: flex;
+  flex-wrap: nowrap;
   overflow-x: auto;
-}
-
-.h_scroller {
-  display: flex;
   gap: 1rem;
+  max-width: 1200px;
 }
 
-.scroller {
-  display: flex;
-  gap: 1rem;
-}
-
-.item {
-  flex: 0 0 auto;
-  width: 250px;
-}
-
-.backdrop {
+.card img {
   width: 100%;
-  height: 141px;
+  height: 150px;
   object-fit: cover;
   border-radius: 10px;
+  margin-bottom: 0.5rem;
 }
 
-.movie.flex {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  margin-top: 0.5rem;
-}
-
-.meta {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 0.5rem;
-}
-
-.meta .release_date {
-  display: flex;
-  align-items: center;
-}
-
-.meta .buttons {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.movie .title {
-  font-weight: bold;
-  color: #fff;
-  text-decoration: none;
-}
-
-.movie .vote_average {
+.vote_average {
   font-size: 0.9rem;
   color: #ccc;
 }

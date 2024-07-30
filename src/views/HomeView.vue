@@ -200,7 +200,7 @@ main {
 
   .banner {
     width: 100%;
-    height: 450px; /* 높이를 약간 줄임 */
+    height: 600px; /* 높이를 약간 줄임 */
     margin-bottom: 2rem;
     position: relative;
     background-color: #000;
@@ -220,7 +220,7 @@ main {
       img {
         width: 100%;
         height: 100%;
-        object-fit: cover; /* 이미지가 잘리지 않고 전체가 보이도록 함 */
+        object-fit: contain;
         background-color: #000;
       }
     }
@@ -230,12 +230,44 @@ main {
       width: 100%;
       height: 100%;
       overflow: hidden;
+
+      /* 이미지 양 옆을 자연스럽게 흐리게 하기 위한 그라데이션 추가 */
+      &::before,
+      &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        width: 20%; /* 그라데이션 영역을 더 넓게 설정 */
+        height: 100%;
+        z-index: 1;
+        pointer-events: none;
+      }
+
+      &::before {
+        left: 0;
+        background: linear-gradient(
+          to right,
+          #000 0%,
+          rgba(0, 0, 0, 0.75) 25%,
+          rgba(0, 0, 0, 0) 50%
+        );
+      }
+
+      &::after {
+        right: 0;
+        background: linear-gradient(
+          to left,
+          #000 0%,
+          rgba(0, 0, 0, 0.75) 25%,
+          rgba(0, 0, 0, 0) 50%
+        );
+      }
     }
 
     .banner__image {
       width: 100%;
       height: 100%;
-      object-fit: cover; /* 이미지가 잘리지 않고 전체가 보이도록 함 */
+      object-fit: contain; /* 이미지가 잘리지 않고 전체가 보이도록 함 */
     }
 
     .banner__image-container::before {
@@ -246,7 +278,7 @@ main {
       width: 100%;
       height: 50%;
       background: linear-gradient(to top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.5) 100%);
-      z-index: 1;
+      z-index: 2; /* 기존 ::before 요소 위에 배치 */
       pointer-events: none;
     }
 
@@ -281,7 +313,7 @@ main {
   margin-top: 50px;
 
   h3 {
-    font-family: 'theJamsil';
+    font-family: var(--fontS);
     font-weight: 300;
     margin-bottom: 20px;
     font-size: 26px;

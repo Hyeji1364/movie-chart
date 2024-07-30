@@ -78,8 +78,8 @@ watch(
   margin-top: 50px;
 
   h3 {
-    font-family: 'The Jamsil';
-    font-weight: 300;
+    font-family: var(--fontJ);
+    font-weight: 500;
     margin-bottom: 20px;
     font-size: 26px;
     color: #e0e0e0;
